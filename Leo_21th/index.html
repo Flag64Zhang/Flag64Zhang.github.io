@@ -16,6 +16,24 @@
       font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
       overflow: hidden; /* 防止动画元素溢出滚动条 */
     }
+    /* 署名样式 */
+    .birthday-from {
+      color: #888;
+      font-size: 1em;
+      opacity: 0;
+      animation: fadeInMsg 1s 1.4s ease-out forwards;
+      position: fixed;
+      right: 32px;
+      bottom: 24px;
+      text-align: right;
+      background: rgba(255,255,255,0.85);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #ffd70033;
+      padding: 10px 18px 8px 18px;
+      z-index: 99;
+      max-width: 90vw;
+      pointer-events: none;
+    }
     /* 贺卡主卡片样式及柔和光晕动画 */
     .birthday-card-bg {
       background: #fffbe6cc;
@@ -175,16 +193,60 @@
       0% { transform: scale(1) translateY(0); }
       100% { transform: scale(1.2) translateY(10px); }
     }
-    /* 署名样式 */
-    .birthday-from {
-      color: #888;
-      font-size: 1em;
-      opacity: 0;
-      animation: fadeInMsg 1s 1.4s ease-out forwards;
+    /* 花瓣样式与动画 */
+    .petal-container {
+      pointer-events: none;
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      z-index: 10;
+      overflow: hidden;
+    }
+    .petal {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+      opacity: 0.85;
+      will-change: transform, opacity;
+      z-index: 10;
+      /* 可用SVG或emoji，下面用渐变椭圆模拟 */
+      background: radial-gradient(ellipse at 60% 40%, #ffb6d5 70%, #fff0 100%);
+      border-radius: 60% 80% 60% 80%/80% 60% 80% 60%;
+      transform: rotate(0deg);
+      box-shadow: 0 2px 8px #ff69b455;
+    }
+    .petal.emoji {
+      background: none;
+      font-size: 22px;
+      text-shadow: 0 2px 8px #ff69b455;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg) scale(1);
+        opacity: 0.9;
+      }
+      80% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(110vh) translateX(var(--x-move, 60px)) rotate(var(--rot, 120deg)) scale(0.95);
+        opacity: 0.2;
+      }
+    }
+    .birthday-message .msg-from {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      color: #b36a00;
+      margin-bottom: 4px;
+      margin-left: 2px;
     }
   </style>
 </head>
 <body>
+  <audio id="bgm" src="./bgm.mp3" autoplay loop hidden></audio>
+  <button id="playMusicBtn" style="position:fixed;top:18px;right:18px;z-index:9999;background:linear-gradient(90deg,#ffb6d5,#ffd700);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:1em;box-shadow:0 2px 8px #ffd70055;cursor:pointer;transition:background 0.3s;">🎵 播放音乐</button>
+  <div class="petal-container"></div>
   <!-- 贺卡主卡片容器 -->
   <div class="birthday-card-bg">
     <!-- 彩色渐变标题和星星特效 -->
@@ -206,6 +268,7 @@
       <span class="glow glow1"></span>
       <span class="glow glow2"></span>
       <span class="glow glow3"></span>
+      <span class="msg-from">铠哥//Leo​<br></span>
       键盘震颤，迸溅的字符​<br>
       是宇宙未被破译的密语​<br>
       二进制的星河在屏幕翻涌​<br>
@@ -226,9 +289,8 @@
       终将燎原，长成理想的巨塔<br>
       愿你每天都能拥有灿烂的笑容，生活充满阳光与希望。
     </div>
-    <!-- 署名 -->
-    <div class="birthday-from">—— PerseverantMind 敬上​<br>2025.06.25 凌晨3时</div>
   </div>
+  <div class="birthday-from">—— PerseverantMind 敬上​<br>2025.06.25 3：00</div>
   <script>
     // 轮播图片渐入渐出特效
     const images = document.querySelectorAll('.carousel-img');
@@ -238,6 +300,41 @@
       current = (current + 1) % images.length;
       images[current].classList.add('active');
     }, 3500);
+    // 花瓣散落特效
+    const petalContainer = document.querySelector('.petal-container');
+    function createPetal() {
+      const petal = document.createElement('div');
+      // 50%概率用emoji花瓣
+      if (Math.random() < 0.5) {
+        petal.className = 'petal emoji';
+        petal.innerText = '🌸';
+      } else {
+        petal.className = 'petal';
+      }
+      // 随机起始位置和动画参数
+      const left = Math.random() * 100;
+      const duration = 6 + Math.random() * 4; // 6~10s
+      const delay = Math.random() * 2;
+      const xMove = (Math.random() - 0.5) * 120; // -60~60px
+      const rot = (Math.random() - 0.5) * 180; // -90~90deg
+      petal.style.left = left + 'vw';
+      petal.style.top = '-24px';
+      petal.style.setProperty('--x-move', `${xMove}px`);
+      petal.style.setProperty('--rot', `${rot}deg`);
+      petal.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+      petalContainer.appendChild(petal);
+      // 动画结束后移除
+      setTimeout(() => petal.remove(), (duration + delay) * 1000);
+    }
+    // 每150ms生成一个花瓣
+    setInterval(createPetal, 150);
+    // 播放音乐按钮逻辑
+    const bgm = document.getElementById('bgm');
+    const btn = document.getElementById('playMusicBtn');
+    btn.addEventListener('click', function() {
+      bgm.play();
+      btn.style.display = 'none'; // 播放后隐藏按钮
+    });
   </script>
 </body>
 </html>
