@@ -1,6 +1,0 @@
-/* 引入字体（Matisse-EB.otf） */
-@font-face {
-  font-family: 'EVA';
-  font-display: swap;
-  src: url('/fonts/EVA.otf') format('opentype');  /* otf字体，ttf把format改成truetype */
-}

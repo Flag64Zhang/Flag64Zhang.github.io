@@ -1485,6 +1485,13 @@ a {
 a:hover {
   color: #49b1f5;
 }
+#site-title,
+#site-subtitle,
+.site-name,
+#aside-content .author-info-name,
+#aside-content .author-info-description {
+  font-family: Matisse-EB;
+}
 .text-center {
   text-align: center;
 }
