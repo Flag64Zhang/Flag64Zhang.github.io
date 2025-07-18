@@ -1,6 +1,6 @@
 /* 引入字体（Matisse-EB.otf） */
 @font-face {
-  font-family: 'Matisse-EB';
+  font-family: 'EVA';
   font-display: swap;
-  src: url('https://perseverantmind.top/fonts/Matisse-EB.otf') format('opentype');  /* otf字体，ttf把format改成truetype */
+  src: url('/fonts/EVA.otf') format('opentype');  /* otf字体，ttf把format改成truetype */
 }
