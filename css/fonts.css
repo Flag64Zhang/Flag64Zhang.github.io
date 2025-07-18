@@ -2,5 +2,5 @@
 @font-face {
   font-family: 'Matisse-EB';
   font-display: swap;
-  src: url('/fonts/Matisse-EB.otf') format('opentype');  /* otf字体，ttf把format改成truetype */
+  src: url('https://perseverantmind.top/fonts/Matisse-EB.otf') format('opentype');  /* otf字体，ttf把format改成truetype */
 }
