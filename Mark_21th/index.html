@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>天子21周岁生日快乐</title>
+  <style>
+    /* 页面整体背景和字体设置 */
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #9f6fff 0%, #00fff7 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+      overflow: hidden; /* 防止动画元素溢出滚动条 */
+    }
+    /* 署名样式 */
+    .birthday-from {
+      color: #888;
+      font-size: 1em;
+      opacity: 0;
+      animation: fadeInMsg 1s 1.4s ease-out forwards;
+      position: fixed;
+      right: 32px;
+      bottom: 24px;
+      text-align: right;
+      background: rgba(255,255,255,0.85);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px #006aff33;
+      padding: 10px 18px 8px 18px;
+      z-index: 99;
+      max-width: 90vw;
+      pointer-events: none;
+    }
+    /* 贺卡主卡片样式及柔和光晕动画 */
+    .birthday-card-bg {
+      background: #fffbe6cc;
+      border-radius: 24px;
+      box-shadow: 0 0 40px 10px #486cc988, 0 0 80px 20px #3ca40488;
+      padding: 40px 32px 32px 32px;
+      max-width: 400px;
+      width: 90vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      animation: fadeInCard 1.2s ease-out forwards, cardGlow 4s ease-in-out infinite alternate;
+      position: relative;
+      z-index: 1;
+    }
+    /* 卡片渐入动画 */
+    @keyframes fadeInCard {
+      from { opacity: 0; transform: translateY(40px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    /* 卡片柔和光晕动画 */
+    @keyframes cardGlow {
+      0% { box-shadow: 0 0 40px 10px #50c2cc88, 0 0 80px 20px #6745ff88; }
+      50% { box-shadow: 0 0 60px 20px #14a9ff88, 0 0 100px 30px #b4ff6988; }
+      100% { box-shadow: 0 0 40px 10px #ffd70088, 0 0 80px 20px #55ff0088; }
+    }
+    /* 标题渐变文字和星星特效 */
+    .birthday-title {
+      font-size: 2.2em;
+      background: linear-gradient(90deg, #008cff, #024eff, #00ddff, #00ff6a, #69b4ff, #ff69b4);
+      background-size: 200% auto;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      text-shadow: 0 0 10px #6cff9d, 0 0 20px #ff0000;
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeInTitle 1s 0.5s ease-out forwards, gradientMove 4s linear infinite alternate;
+      position: relative;
+    }
+    /* 标题渐入动画 */
+    @keyframes fadeInTitle {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* 标题渐变动画 */
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    /* 星星动画样式 */
+    .birthday-title .star { 
+      position: absolute;
+      color: #fffbe0;
+      font-size: 0.7em;
+      animation: twinkle 2s infinite alternate;
+      pointer-events: none;
+    }
+    .birthday-title .star1 { left: -18px; top: -10px; animation-delay: 0.2s; }
+    .birthday-title .star2 { right: -18px; top: -12px; animation-delay: 0.7s; }
+    .birthday-title .star3 { left: 50%; top: -22px; font-size: 1em; animation-delay: 1.1s; }
+    /* 星星闪烁动画 */
+    @keyframes twinkle {
+      0% { opacity: 0.7; text-shadow: 0 0 6px #fffbe0, 0 0 12px #ffd700; }
+      100% { opacity: 1; text-shadow: 0 0 12px #ffd700, 0 0 24px #ff69b4; }
+    }
+    /* 贺卡图片及浮动动画 */
+    .birthday-img {
+      border-radius: 16px;
+      box-shadow: 0 0 20px #58e2af, 0 0 40px #58a5cb88;
+      margin-bottom: 20px;
+      max-width: 260px;
+      width: 100%;
+      opacity: 0;
+      animation: fadeInImg 1s 0.8s ease-out forwards, floatImg 3.5s ease-in-out infinite alternate;
+    }
+    /* 图片渐入动画 */
+    @keyframes fadeInImg {
+      from { opacity: 0; transform: scale(0.9) rotate(-3deg); }
+      to { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    /* 图片浮动动画 */
+    @keyframes floatImg {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-10px) scale(1.03); }
+    }
+    /* 轮播组件样式 */
+    .carousel-container {
+      width: 260px;
+      height: 180px;
+      margin-bottom: 18px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 16px;
+      box-shadow: 0 0 12px #ffd70044;
+      background: #fffbe6cc;
+    }
+    .carousel-img {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      opacity: 0;
+      transition: opacity 1.2s;
+      z-index: 0;
+    }
+    .carousel-img.active {
+      opacity: 1;
+      z-index: 1;
+      transition: opacity 1.2s;
+    }
+    /* 祝福语样式及背景光斑特效 */
+    .birthday-message {
+      font-size: 1.15em;
+      color: #3d6d78;
+      background: rgba(255, 255, 224, 0.7);
+      border-radius: 12px;
+      padding: 18px 12px;
+      margin-bottom: 18px;
+      box-shadow: 0 0 10px #ffd90088;
+      text-align: center;
+      opacity: 0;
+      animation: fadeInMsg 1s 1.1s ease-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 祝福语渐入动画 */
+    @keyframes fadeInMsg {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    /* 背景光斑动画样式 */
+    .birthday-message .glow {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.25;
+      filter: blur(8px);
+      animation: glowMove 4s linear infinite alternate;
+    }
+    .birthday-message .glow1 {
+      width: 60px; height: 60px; left: -20px; top: -10px; background: #00d5ff; animation-delay: 0s;
+    }
+    .birthday-message .glow2 {
+      width: 40px; height: 40px; right: -10px; top: 10px; background: #7ce100; animation-delay: 1.2s;
+    }
+    .birthday-message .glow3 {
+      width: 30px; height: 30px; left: 40%; bottom: -10px; background: #eaff00; animation-delay: 2.1s;
+    }
+    /* 背景光斑移动动画 */
+    @keyframes glowMove {
+      0% { transform: scale(1) translateY(0); }
+      100% { transform: scale(1.2) translateY(10px); }
+    }
+    /* 花瓣样式与动画 */
+    .petal-container {
+      pointer-events: none;
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      z-index: 10;
+      overflow: hidden;
+    }
+    .petal {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      pointer-events: none;
+      opacity: 0.85;
+      will-change: transform, opacity;
+      z-index: 10;
+      /* 可用SVG或emoji，下面用渐变椭圆模拟 */
+      background: radial-gradient(ellipse at 60% 40%, #a3e3ff 70%, #fff0 100%);
+      border-radius: 60% 80% 60% 80%/80% 60% 80% 60%;
+      transform: rotate(0deg);
+      box-shadow: 0 2px 8px #a3e3ff;
+    }
+    .petal.emoji {
+      background: none;
+      font-size: 22px;
+      text-shadow: 0 2px 8px #0d24a755;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-10vh) translateX(0) rotate(0deg) scale(1);
+        opacity: 0.9;
+      }
+      80% {
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(110vh) translateX(var(--x-move, 60px)) rotate(var(--rot, 120deg)) scale(0.95);
+        opacity: 0.2;
+      }
+    }
+    .birthday-message .msg-from {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      color: #00d9ff;
+      margin-bottom: 4px;
+      margin-left: 2px;
+    }
+  </style>
+</head>
+<body>
+  <audio id="bgm" src="./bgm.mp3" autoplay loop hidden></audio>
+  <button id="playMusicBtn" style="position:fixed;top:18px;right:18px;z-index:9999;background:linear-gradient(90deg,#ffb6d5,#ffd700);color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:1em;box-shadow:0 2px 8px #ffd70055;cursor:pointer;transition:background 0.3s;">🎵 播放音乐</button>
+  <div class="petal-container"></div>
+  <!-- 贺卡主卡片容器 -->
+  <div class="birthday-card-bg">
+    <!-- 彩色渐变标题和星星特效 -->
+    <h1 class="birthday-title">
+      🎉 天子生日快乐！🎉
+      <span class="star star1">★</span>
+      <span class="star star2">✦</span>
+      <span class="star star3">✧</span>
+    </h1>
+    <!-- 轮播图片组件，渐入渐出切换 -->
+    <div class="carousel-container">
+      <img class="carousel-img active" src="./images/1.jpg" alt="轮播图片1">
+      <img class="carousel-img" src="./images/2.jpg" alt="轮播图片2">
+      <img class="carousel-img" src="./images/3.jpg" alt="轮播图片3">
+      <img class="carousel-img" src="./images/4.jpg" alt="轮播图片4">
+      <img class="carousel-img" src="./images/5.jpg" alt="轮播图片5">
+      <img class="carousel-img" src="./images/6.jpg" alt="轮播图片6">
+      <img class="carousel-img" src="./images/7.jpg" alt="轮播图片7">
+      <img class="carousel-img" src="./images/8.jpg" alt="轮播图片8">
+      <img class="carousel-img" src="./images/9.jpg" alt="轮播图片9">
+      <img class="carousel-img" src="./images/10.jpg" alt="轮播图片10">
+      <img class="carousel-img" src="./images/11.jpg" alt="轮播图片11">
+      <img class="carousel-img" src="./images/12.jpg" alt="轮播图片12">
+      <img class="carousel-img" src="./images/13.jpg" alt="轮播图片13">
+      <img class="carousel-img" src="./images/14.jpg" alt="轮播图片14">
+    </div>
+    <!-- 祝福语，带背景光斑特效 -->
+    <div class="birthday-message">
+      <span class="glow glow1"></span>
+      <span class="glow glow2"></span>
+      <span class="glow glow3"></span>
+      <span class="msg-from">天子//Mark<br></span>
+      《贺发小廿一岁生辰》<br>
+      <br>
+      三晋少年意气扬，篮台排场逞锋芒。<br>
+      并州春酒斟新岁，笑揽长风向远方。<br>
+      愿你球场常得胜，廿一朝气满行囊。<br>
+      青春正好青云路，岁岁皆如今日畅！<br>
+      <br>  
+      咱太原的后生就是攒劲！<br>
+      排球、篮球、台球场上，咱就没输过！<br>
+      今儿二十一生日，咱把汾酒满上！<br>
+      祝你往后打球场场顺，日子过得顶顶美，岁数越长越精神！<br>
+      生日快乐嗷天子！
+    </div>
+  </div>
+  <div class="birthday-from">—— 明毅 敬上​<br>2025.12.09 00：00</div>
+  <script>
+    // 轮播图片渐入渐出特效
+    const images = document.querySelectorAll('.carousel-img');
+    let current = 0;
+    setInterval(() => {
+      images[current].classList.remove('active');
+      current = (current + 1) % images.length;
+      images[current].classList.add('active');
+    }, 3500);
+    // 花瓣散落特效
+    const petalContainer = document.querySelector('.petal-container');
+    function createPetal() {
+      const petal = document.createElement('div');
+      // 50%概率用emoji花瓣
+      if (Math.random() < 0.5) {
+        petal.className = 'petal emoji';
+        petal.innerText = '🎂';
+      } else {
+        petal.className = 'petal';
+      }
+      // 随机起始位置和动画参数
+      const left = Math.random() * 100;
+      const duration = 6 + Math.random() * 4; // 6~10s
+      const delay = Math.random() * 2;
+      const xMove = (Math.random() - 0.5) * 120; // -60~60px
+      const rot = (Math.random() - 0.5) * 180; // -90~90deg
+      petal.style.left = left + 'vw';
+      petal.style.top = '-24px';
+      petal.style.setProperty('--x-move', `${xMove}px`);
+      petal.style.setProperty('--rot', `${rot}deg`);
+      petal.style.animation = `fall ${duration}s linear ${delay}s forwards`;
+      petalContainer.appendChild(petal);
+      // 动画结束后移除
+      setTimeout(() => petal.remove(), (duration + delay) * 1000);
+    }
+    // 每150ms生成一个花瓣
+    setInterval(createPetal, 150);
+    // 播放音乐按钮逻辑
+    const bgm = document.getElementById('bgm');
+    const btn = document.getElementById('playMusicBtn');
+    btn.addEventListener('click', function() {
+      bgm.play();
+      btn.style.display = 'none'; // 播放后隐藏按钮
+    });
+  </script>
+</body>
+</html>
