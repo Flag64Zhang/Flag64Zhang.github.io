@@ -333,18 +333,31 @@
 			.rose.right { right: 24px; bottom: 24px; animation-delay: 3s; }
 			@keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
 
-			.star {
+			/* Emoji下落动画层（替换静态星星与蛋糕） */
+			.fall-layer {
 				position: fixed;
-				width: 2px; height: 2px;
-				border-radius: 50%;
-				background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0.2));
-				box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-				opacity: 0.8;
+				inset: 0;
 				pointer-events: none;
-				z-index: 0;
-				animation: twinkle 3.2s infinite ease-in-out;
+				z-index: 1;
 			}
-			@keyframes twinkle { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-2px); } }
+			.fall-emoji {
+				position: absolute;
+				top: -10vh;
+				user-select: none;
+				will-change: transform, opacity;
+				opacity: 0.95;
+				animation-name: emojiFall;
+				animation-timing-function: linear;
+				animation-fill-mode: forwards;
+			}
+			.fall-emoji.star { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+			.fall-emoji.cake { filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25)); }
+			@keyframes emojiFall {
+				0%   { transform: translate3d(var(--drift, 0), -12vh, 0) rotate(var(--rotStart, 0deg)); opacity: 0; }
+				10%  { opacity: 1; }
+				50%  { transform: translate3d(calc(var(--drift, 0) * 0.6), 50vh, 0) rotate(var(--rotMid, 120deg)); }
+				100% { transform: translate3d(calc(var(--drift, 0) * 1.2), 110vh, 0) rotate(var(--rotEnd, 240deg)); opacity: 0.98; }
+			}
 
 			.footer {
 				position: fixed;
@@ -599,22 +612,56 @@
 				});
 			}
 
-			function makeStars(n = 80) {
-				const frag = document.createDocumentFragment();
-				for (let i = 0; i < n; i++) {
-					const s = document.createElement('span');
-					s.className = 'star';
-					const left = Math.random() * 100;
-					const top = Math.random() * 100;
-					s.style.left = left + '%';
-					s.style.top = top + '%';
-					s.style.animationDelay = (Math.random() * 3.6) + 's';
-					s.style.transform = 'scale(' + (0.6 + Math.random() * 1.6) + ')';
-					frag.appendChild(s);
+			// 启动动态下落的星星与蛋糕 emoji
+			(function initEmojiFall() {
+				let timer = null;
+				const weights = { star: 0.76, cake: 0.24 };
+				const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+				function ensureLayer() {
+					let layer = document.querySelector('.fall-layer');
+					if (!layer) {
+						layer = document.createElement('div');
+						layer.className = 'fall-layer';
+						document.body.appendChild(layer);
+					}
+					return layer;
 				}
-				document.body.appendChild(frag);
-			}
-			document.addEventListener('DOMContentLoaded', () => makeStars(100));
+				function spawnOne() {
+					const layer = ensureLayer();
+					const isStar = Math.random() < weights.star;
+					const el = document.createElement('span');
+					el.className = 'fall-emoji ' + (isStar ? 'star' : 'cake');
+					el.textContent = isStar ? pick(['✨','⭐']) : pick(['🎂','🍰']);
+					el.style.left = (Math.random() * 100).toFixed(2) + '%';
+					const sizePx = isStar ? (16 + Math.random() * 20) : (20 + Math.random() * 26);
+					el.style.fontSize = sizePx + 'px';
+					const dur = (5 + Math.random() * 4).toFixed(2);
+					el.style.animationDuration = dur + 's';
+					const drift = ((Math.random() * 60) - 30).toFixed(2) + 'vw';
+					el.style.setProperty('--drift', drift);
+					el.style.setProperty('--rotStart', ((Math.random() * 60) - 30).toFixed(1) + 'deg');
+					el.style.setProperty('--rotMid', ((Math.random() * 200) - 100).toFixed(1) + 'deg');
+					el.style.setProperty('--rotEnd', ((Math.random() * 260) - 130).toFixed(1) + 'deg');
+					el.addEventListener('animationend', () => { el.remove(); });
+					layer.appendChild(el);
+					// 控制最大数量，避免过多元素堆积
+					if (layer.childElementCount > 140) {
+						for (let i = 0; i < layer.childElementCount - 120; i++) {
+							const first = layer.firstElementChild;
+							if (first) first.remove();
+						}
+					}
+				}
+				function start() { if (!timer) timer = setInterval(spawnOne, 220); }
+				function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+				document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
+				document.addEventListener('DOMContentLoaded', () => {
+					// 清理可能存在的旧静态层
+					document.querySelectorAll('.emoji-layer').forEach(el => el.remove());
+					document.querySelectorAll('span.star').forEach(el => el.remove());
+					start();
+				});
+			})();
 
 			// JS 轮播回退：交叉淡入 + 当前图轻柔缩放
 			(function initJsSlideshow() {
