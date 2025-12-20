@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>父亲五十生日电子贺卡</title>
+		<link rel="preload" as="audio" href="bgm.mp3" />
+		<!-- 预加载轮播图片，减少切换时的解码卡顿 -->
+		<link rel="preload" as="image" href="1.jpg" />
+		<link rel="preload" as="image" href="2.jpg" />
+		<link rel="preload" as="image" href="3.jpg" />
+		<link rel="preload" as="image" href="4.jpg" />
+		<link rel="preload" as="image" href="5.jpg" />
+		<link rel="preload" as="image" href="6.jpg" />
+		<link rel="preload" as="image" href="7.jpg" />
+		<link rel="preload" as="image" href="8.jpg" />
+		<link rel="preload" as="image" href="9.jpg" />
+		<style>
+			:root {
+				--red: #b10000;
+				--deep-red: #7a0000;
+				--dark: #400000;
+				--gold: #ffd54f;
+				--gold-strong: #ffcc00;
+				--light: #fff2cc;
+			}
+
+			* { box-sizing: border-box; }
+
+			body {
+				margin: 0;
+				color: #4a2a00;
+				font-family: "Microsoft YaHei", "Noto Sans SC", "PingFang SC", "HarmonyOS Sans", sans-serif;
+				background: radial-gradient(1200px 600px at 50% 30%, #fff3b0 0%, #ffe082 40%, #ffca28 70%, #ffb300 100%);
+				overflow-x: hidden;
+				overflow-y: auto;
+			}
+
+			.container {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 28px;
+				padding: 48px 16px 96px;
+				position: relative;
+				z-index: 2;
+			}
+
+			.title {
+				font-size: clamp(32px, 5.2vw, 56px);
+				font-weight: 800;
+				letter-spacing: 0.08em;
+				color: var(--gold);
+				-webkit-text-stroke: 0.6px rgba(64, 32, 0, 0.25);
+				text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 0 18px rgba(255, 215, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.18);
+				padding: 12px 22px;
+				border-radius: 999px;
+				background: linear-gradient(180deg, rgba(255, 235, 59, 0.45), rgba(255, 235, 59, 0.12));
+				border: 2px solid rgba(255, 215, 0, 0.45);
+				box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25), 0 0 18px rgba(255, 215, 0, 0.35);
+			}
+
+			.frame {
+				width: min(920px, 92vw);
+				aspect-ratio: 16 / 9;
+				border-radius: 28px;
+				border: 10px solid var(--gold-strong);
+				background: radial-gradient(1200px 800px at 50% 50%, rgba(255, 235, 59, 0.20) 0%, rgba(255, 235, 59, 0.08) 45%, rgba(0, 0, 0, 0.12) 100%);
+				box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45), inset 0 0 36px rgba(255, 215, 0, 0.35);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.slides {
+				position: absolute;
+				inset: 0;
+				backface-visibility: hidden;
+				contain: layout paint;
+				transform: translateZ(0);
+			}
+
+			/* JS 回退模式：用过渡实现稳定淡入淡出 */
+			.slides.js-mode .slide {
+				animation: none; opacity: 0;
+				transition: opacity 900ms cubic-bezier(.22,.61,.36,1);
+				will-change: opacity;
+			}
+			.slides.js-mode .slide.active { opacity: 1; }
+			/* JS 模式下，为当前激活的幻灯片附加轻柔缩放（Ken Burns） */
+			.slides.js-mode .slide.zoom-active { animation: zoomActive 6s ease-in-out both; }
+			@keyframes zoomActive {
+				0% { transform: scale(1.02); }
+				100% { transform: scale(1.07); }
+			}
+
+			.slide {
+				position: absolute;
+				inset: 0;
+				background-size: cover;
+				background-position: center;
+				opacity: 0;
+				animation: fade 24s infinite, zoom 24s infinite;
+				transform: scale(1.02);
+				will-change: opacity, transform;
+				filter: saturate(1.1) contrast(1.05);
+			}
+
+			.slide::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background: radial-gradient(600px 300px at 10% 15%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%),
+					radial-gradient(900px 450px at 95% 85%, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0) 60%);
+			}
+
+			.slide:nth-child(1) { animation-delay: 0s; }
+			.slide:nth-child(2) { animation-delay: 6s; }
+			.slide:nth-child(3) { animation-delay: 12s; }
+			.slide:nth-child(4) { animation-delay: 18s; }
+
+			@keyframes fade {
+				0%, 20% { opacity: 1; }
+				25%, 100% { opacity: 0; }
+			}
+
+			@keyframes zoom {
+				0%   { transform: scale(1.02) translate3d(0,0,0); }
+				50%  { transform: scale(1.07) translate3d(0,0,0); }
+				100% { transform: scale(1.02) translate3d(0,0,0); }
+			}
+
+			.frame-gilt {
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background: conic-gradient(from 180deg at 50% 50%, rgba(255, 235, 59, 0.28), rgba(255, 235, 59, 0), rgba(255, 235, 59, 0.28));
+				mix-blend-mode: screen;
+				opacity: 0.35;
+			}
+
+			/* 折叠容器 & 标题 */
+			.poem-toggle {
+				width: min(920px, 92vw);
+				border-radius: 14px;
+				border: 1px solid rgba(255, 215, 0, 0.35);
+				background: linear-gradient(180deg, rgba(255, 235, 59, 0.22), rgba(255, 235, 59, 0.08));
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 0 18px rgba(255, 215, 0, 0.18);
+				color: #4a2a00;
+				overflow: hidden;
+			}
+			.poem-toggle summary {
+				list-style: none;
+				cursor: pointer;
+				padding: 14px 18px;
+				display: flex; align-items: center; justify-content: space-between;
+				font-size: clamp(18px, 3.2vw, 24px);
+				font-weight: 700;
+				color: var(--gold);
+				text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+				position: relative;
+				background: linear-gradient(180deg, rgba(255, 235, 59, 0.35), rgba(255, 235, 59, 0.08));
+				border-bottom: 1px solid rgba(255, 215, 0, 0.35);
+			}
+			.poem-toggle[open] summary { animation: pulseGlow 0.9s ease 0s 1; }
+			@keyframes pulseGlow {
+				0%   { filter: brightness(1); text-shadow: 0 0 10px rgba(255, 215, 0, 0.40); }
+				50%  { filter: brightness(1.14); text-shadow: 0 0 16px rgba(255, 215, 0, 0.70); }
+				100% { filter: brightness(1); text-shadow: 0 0 10px rgba(255, 215, 0, 0.40); }
+			}
+
+			/* 彩带标签风：左侧小装饰条 */
+			.poem-toggle summary::before {
+				content: "";
+				position: absolute;
+				left: 10px; top: 50%; transform: translateY(-50%);
+				width: 6px; height: 60%;
+				border-radius: 3px;
+				background: linear-gradient(180deg, #ffe57f, #ffca28);
+				box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+			}
+
+			/* 标题内容区域（图标+文字） */
+			.summary-left { display: inline-flex; align-items: center; gap: 10px; padding-left: 22px; }
+			.summary-left .icon { width: 20px; height: 20px; display: inline-block; filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6)); }
+			.summary-left .icon path { fill: var(--gold); }
+			.poem-toggle summary::-webkit-details-marker { display: none; }
+			.poem-toggle summary .chev {
+				width: 10px; height: 10px; border-right: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
+				transform: rotate(45deg); transition: transform 0.25s ease;
+				filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+			}
+			.poem-toggle[open] summary .chev { transform: rotate(-135deg); }
+
+			/* 折叠内容主体 */
+			.poem {
+				width: min(920px, 92vw);
+				padding: 18px 20px 22px;
+				border-radius: 18px;
+				border: 1px solid rgba(255, 215, 0, 0.35);
+				background: linear-gradient(180deg, rgba(255, 204, 0, 0.18), rgba(255, 204, 0, 0.08));
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(255, 215, 0, 0.25);
+				color: #4a2a00;
+			}
+
+			/* 祝寿诗插图包装，支持高光掠过 */
+			.poem-illustration-wrap {
+				position: relative;
+				overflow: hidden;
+				border-radius: 12px;
+				border: 1px solid rgba(255, 215, 0, 0.3);
+				box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 215, 0, 0.35);
+				margin: 4px 0 14px;
+				opacity: 0;
+				transform: translateY(6px) scale(0.98);
+				transition: opacity 0.45s ease, transform 0.45s ease;
+			}
+			.poem-toggle[open] .poem-illustration-wrap { opacity: 1; transform: translateY(0) scale(1); }
+
+			/* 高光掠过伪元素 */
+			.poem-illustration-wrap::after {
+				content: "";
+				position: absolute;
+				top: -20%; left: -40%;
+				width: 40%; height: 140%;
+				background: linear-gradient(60deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0.1) 60%, rgba(255,255,255,0) 100%);
+				transform: rotate(10deg);
+				opacity: 0;
+				pointer-events: none;
+			}
+			.poem-toggle[open] .poem-illustration-wrap::after {
+				animation: sheen 1.2s ease-out 0.1s 1 forwards;
+			}
+			@keyframes sheen {
+				0%   { left: -40%; opacity: 0; }
+				10%  { opacity: 1; }
+				100% { left: 140%; opacity: 0; }
+			}
+
+			/* 原图自适应比例，继承圆角 */
+			.poem-illustration {
+				display: block;
+				width: 100%;
+				height: auto;
+				border-radius: inherit;
+			}
+
+			.poem h2 {
+				margin: 0 0 8px;
+				font-size: clamp(20px, 3vw, 26px);
+				color: var(--gold);
+				letter-spacing: 0.1em;
+				text-shadow: 0 0 14px rgba(255, 215, 0, 0.5);
+			}
+
+			.poem .lines {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 6px;
+				font-size: clamp(16px, 2.4vw, 20px);
+				line-height: 1.85;
+				text-align: center;
+				/* 入场动画 */
+			}
+
+			/* 祝寿诗首句：更大字号与居中 */
+			.poem-title-line {
+				font-size: clamp(22px, 4.8vw, 32px);
+				font-weight: 700;
+				letter-spacing: 0.03em;
+				text-align: center;
+			}
+
+			.poem .lines > div {
+				opacity: 0;
+				transform: translateY(8px);
+				animation: poemFadeUp 900ms ease forwards;
+			}
+			.poem .lines > div:nth-child(1) { animation-delay: 0s; }
+			.poem .lines > div:nth-child(2) { animation-delay: 0.2s; }
+			.poem .lines > div:nth-child(3) { animation-delay: 0.4s; }
+			.poem .lines > div:nth-child(4) { animation-delay: 0.6s; }
+
+			@keyframes poemFadeUp {
+				from { opacity: 0; transform: translateY(8px); }
+				to   { opacity: 1; transform: translateY(0); }
+			}
+
+			.sound-overlay {
+				position: fixed;
+				inset: 0;
+				display: grid;
+				place-items: center;
+				background: radial-gradient(800px 400px at 50% 50%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.6));
+				z-index: 5;
+				transition: opacity 0.35s ease, visibility 0.35s ease;
+			}
+			.sound-overlay.hide { opacity: 0; visibility: hidden; }
+
+			.sound-button {
+				display: inline-flex;
+				align-items: center;
+				gap: 12px;
+				padding: 14px 18px;
+				border-radius: 999px;
+				border: 2px solid var(--gold);
+				background: linear-gradient(180deg, rgba(255, 204, 0, 0.35), rgba(255, 204, 0, 0.12));
+				color: var(--gold);
+				font-size: clamp(16px, 2.6vw, 18px);
+				cursor: pointer;
+				box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 14px rgba(255, 215, 0, 0.45);
+			}
+			.sound-button .note {
+				width: 28px; height: 28px;
+				border-radius: 50%;
+				background: radial-gradient(circle, #fff9e6, var(--gold-strong));
+				box-shadow: 0 0 18px rgba(255, 215, 0, 0.7);
+				animation: pulse 2s infinite ease-in-out;
+			}
+			@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+			.rose {
+				position: fixed;
+				width: 120px;
+				height: 120px;
+				opacity: 0.85;
+				filter: drop-shadow(0 8px 16px rgba(255, 179, 0, 0.35));
+				z-index: 1;
+				animation: sway 6s ease-in-out infinite;
+			}
+			.rose.left { left: 24px; top: 24px; }
+			.rose.right { right: 24px; bottom: 24px; animation-delay: 3s; }
+			@keyframes sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+
+			.star {
+				position: fixed;
+				width: 2px; height: 2px;
+				border-radius: 50%;
+				background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0.2));
+				box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+				opacity: 0.8;
+				pointer-events: none;
+				z-index: 0;
+				animation: twinkle 3.2s infinite ease-in-out;
+			}
+			@keyframes twinkle { 0%, 100% { opacity: 0.25; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-2px); } }
+
+			.footer {
+				position: fixed;
+				left: 0; right: 0; bottom: 12px;
+				text-align: center;
+				color: #7a4a00;
+				font-size: 14px;
+				letter-spacing: 0.06em;
+				text-shadow: 0 0 10px rgba(255, 215, 0, 0.45);
+				z-index: 2;
+			}
+			/* 彩色纸屑动效：更青春活力 */
+			.confetti {
+				position: fixed;
+				top: -10vh;
+				width: 8px; height: 14px;
+				border-radius: 2px;
+				opacity: 0.9;
+				z-index: 1;
+				pointer-events: none;
+				animation-name: confettiFall;
+				animation-timing-function: linear;
+				animation-iteration-count: infinite;
+			}
+			.confetti.round { border-radius: 999px; width: 10px; height: 10px; }
+			.confetti.tiny  { width: 6px; height: 10px; }
+			@keyframes confettiFall {
+				0%   { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; }
+				10%  { opacity: 1; }
+				50%  { transform: translate3d(0, 50vh, 0) rotate(180deg); }
+				100% { transform: translate3d(0, 110vh, 0) rotate(360deg); opacity: 0.95; }
+			}
+
+			@media (max-width: 520px) {
+				.rose { width: 84px; height: 84px; }
+				.frame { border-width: 10px; border-radius: 22px; }
+				/* 限制插图在小屏的最大高度，避免过长 */
+				.poem-illustration {
+					max-height: 58vh;
+					max-width: 100%;
+					width: auto; /* 让高度限制生效时，按比例缩小宽度 */
+					margin-left: auto; margin-right: auto;
+				}
+			}
+
+			/* 常驻音乐控制按钮 */
+			.music-ctrl {
+				position: fixed;
+				top: 16px; right: 16px;
+				width: 44px; height: 44px;
+				border-radius: 50%;
+				border: 2px solid rgba(255, 215, 0, 0.7);
+				background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35), rgba(255, 204, 0, 0.35));
+				box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.55);
+				color: var(--gold);
+				cursor: pointer;
+				display: grid; place-items: center;
+				z-index: 6;
+			}
+			.music-ctrl .icon {
+				width: 18px; height: 18px;
+				position: relative;
+			}
+			.music-ctrl.playing .icon::before,
+			.music-ctrl.playing .icon::after {
+				content: "";
+				position: absolute;
+				width: 5px; height: 16px;
+				background: var(--gold);
+				box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+				border-radius: 2px;
+				top: 1px;
+			}
+			.music-ctrl.playing .icon::before { left: 2px; }
+			.music-ctrl.playing .icon::after { right: 2px; }
+			.music-ctrl.paused .icon::before {
+				content: "";
+				position: absolute;
+				left: 3px; top: 1px;
+				width: 0; height: 0;
+				border-left: 14px solid var(--gold);
+				border-top: 8px solid transparent;
+				border-bottom: 8px solid transparent;
+				filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7));
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="title">祝老爸五十岁生日快乐！</div>
+
+			<div class="frame" aria-label="贺卡相册">
+				<div class="slides">
+					<div class="slide" style="background-image: url('images/1.jpg'), radial-gradient(800px 600px at 50% 50%, #fff3b0, #ffca28);"></div>
+					<div class="slide" style="background-image: url('images/2.jpg'), radial-gradient(800px 600px at 50% 50%, #fff7c4, #ffd54f);"></div>
+					<div class="slide" style="background-image: url('images/3.jpg'), radial-gradient(800px 600px at 50% 50%, #ffe082, #ffb300);"></div>
+					<div class="slide" style="background-image: url('images/4.jpg'), radial-gradient(800px 600px at 50% 50%, #fff1a8, #ffca28);"></div>
+                    <div class="slide" style="background-image: url('images/5.jpg'), radial-gradient(800px 600px at 50% 50%, #fff3b0, #ffca28);"></div>
+					<div class="slide" style="background-image: url('images/6.jpg'), radial-gradient(800px 600px at 50% 50%, #fff7c4, #ffd54f);"></div>
+					<div class="slide" style="background-image: url('images/7.jpg'), radial-gradient(800px 600px at 50% 50%, #ffe082, #ffb300);"></div>
+					<div class="slide" style="background-image: url('images/8.jpg'), radial-gradient(800px 600px at 50% 50%, #fff1a8, #ffca28);"></div>
+                    <div class="slide" style="background-image: url('images/9.jpg'), radial-gradient(800px 600px at 50% 50%, #fff3b0, #ffca28);"></div>
+				</div>
+				<div class="frame-gilt"></div>
+			</div>
+
+			<details class="poem-toggle" id="poemToggle" aria-label="祝寿诗">
+				<summary>
+					<span class="summary-left">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+							<!-- 简化书卷图标 -->
+							<path d="M6 5h10a3 3 0 013 3v6a3 3 0 01-3 3H9a3 3 0 11-6 0V8a3 3 0 013-3z"/>
+							<path d="M6 7a1 1 0 00-1 1v10a1 1 0 002 0 1 1 0 011-1h10a1 1 0 001-1V8a1 1 0 00-1-1H6z"/>
+						</svg>
+						<span>祝寿诗</span>
+					</span>
+					<span class="chev" aria-hidden="true"></span>
+				</summary>
+				<div class="poem">
+					<div class="poem-illustration-wrap">
+						<img class="poem-illustration" src="images/poem.jpg" alt="祝寿插图" loading="lazy" />
+					</div>
+					<div class="lines" id="poemLines">
+                        <div class="poem-title-line">贺家父五十寿辰</div>
+						<div>半生伏案佐庠门，宦海曾经风雨痕。</div>
+						<div>跌宕终随云影散，心安始觉岁华温。</div>
+						<div>昔年稚语多冲撞，今日躬身愧不言。</div>
+						<div>舐犊情深恩未报，寸心拳拳奉清樽。</div>
+						<div>漫将可乐酬闲昼，莫以红牛代晓暾。</div>
+						<div>愿得身康如松柏，春秋常伴笑颜存。</div>
+						<div>航拍云际千峰色，镜摄人间万象新。</div>
+						<div>此趣悠悠堪自乐，何须俗事扰心神。</div>
+						<div>孩儿自有四方志，敢向天涯觅锦垠。</div>
+						<div>不负庭前殷切望，功成衣锦报慈恩。</div>
+					</div>
+				</div>
+			</details>
+		</div>
+
+		<div class="footer">襟怀坦荡·志趣高远</div>
+
+		<audio id="bgm" src="bgm.mp3" preload="auto" loop></audio>
+		<button class="music-ctrl paused" id="musicCtrl" type="button" aria-label="音乐播放/暂停" aria-pressed="false">
+			<span class="icon" aria-hidden="true"></span>
+		</button>
+		<div class="sound-overlay" id="soundOverlay">
+			<button class="sound-button" id="soundButton" type="button" aria-label="点击开启音乐">
+				<span class="note" aria-hidden="true"></span>
+				点击开启音乐
+			</button>
+		</div>
+
+		<svg class="rose left" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+			<defs>
+				<radialGradient id="rg1" cx="50%" cy="50%" r="50%">
+					<stop offset="0%" stop-color="#fff3b0" />
+					<stop offset="60%" stop-color="#ffca28" />
+					<stop offset="100%" stop-color="#ffb300" />
+				</radialGradient>
+				<linearGradient id="lgSt" x1="0" x2="0" y1="0" y2="1">
+					<stop offset="0%" stop-color="#2b8a3e" />
+					<stop offset="100%" stop-color="#165b25" />
+				</linearGradient>
+			</defs>
+			<circle cx="60" cy="60" r="26" fill="url(#rg1)" />
+			<path d="M60 36c10 4 18 12 18 22s-8 18-18 22c-10-4-18-12-18-22s8-18 18-22z" fill="url(#rg1)" opacity="0.85" />
+			<path d="M20 110c12-14 24-20 40-20s28 6 40 20" fill="none" stroke="url(#lgSt)" stroke-width="6" stroke-linecap="round" />
+		</svg>
+		<svg class="rose right" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+			<defs>
+				<radialGradient id="rg2" cx="50%" cy="50%" r="50%">
+					<stop offset="0%" stop-color="#fff7c4" />
+					<stop offset="60%" stop-color="#ffd54f" />
+					<stop offset="100%" stop-color="#ffb300" />
+				</radialGradient>
+				<linearGradient id="lgSt2" x1="0" x2="0" y1="0" y2="1">
+					<stop offset="0%" stop-color="#369b4a" />
+					<stop offset="100%" stop-color="#1c6b2e" />
+				</linearGradient>
+			</defs>
+			<circle cx="60" cy="60" r="26" fill="url(#rg2)" />
+			<path d="M60 36c10 4 18 12 18 22s-8 18-18 22c-10-4-18-12-18-22s8-18 18-22z" fill="url(#rg2)" opacity="0.85" />
+			<path d="M20 110c12-14 24-20 40-20s28 6 40 20" fill="none" stroke="url(#lgSt2)" stroke-width="6" stroke-linecap="round" />
+		</svg>
+
+		<script>
+			const audio = document.getElementById('bgm');
+			const overlay = document.getElementById('soundOverlay');
+			const btn = document.getElementById('soundButton');
+			const musicCtrl = document.getElementById('musicCtrl');
+			const poemToggle = document.getElementById('poemToggle');
+			const poemLines = document.getElementById('poemLines');
+
+			function updateCtrl() {
+				if (!musicCtrl || !audio) return;
+				const playing = !audio.paused;
+				musicCtrl.classList.toggle('playing', playing);
+				musicCtrl.classList.toggle('paused', !playing);
+				musicCtrl.setAttribute('aria-pressed', playing ? 'true' : 'false');
+			}
+
+			function attemptPlay() {
+				if (!audio) return;
+				audio.play().then(() => {
+					overlay.classList.add('hide');
+				}).catch(() => {
+					overlay.classList.remove('hide');
+				});
+			}
+
+			document.addEventListener('DOMContentLoaded', attemptPlay);
+			['pointerdown','touchstart','click','keydown'].forEach(ev => {
+				document.addEventListener(ev, () => {
+					if (audio.paused) {
+						audio.play().catch(() => {});
+					}
+					overlay.classList.add('hide');
+				}, { once: true });
+			});
+			if (btn) btn.addEventListener('click', attemptPlay);
+			if (musicCtrl) {
+				musicCtrl.addEventListener('click', () => {
+					if (!audio) return;
+					if (audio.paused) {
+						audio.play().catch(() => {});
+						overlay.classList.add('hide');
+					} else {
+						audio.pause();
+					}
+					updateCtrl();
+				});
+			}
+			if (audio) {
+				audio.addEventListener('play', updateCtrl);
+				audio.addEventListener('pause', updateCtrl);
+				document.addEventListener('DOMContentLoaded', updateCtrl);
+			}
+
+			// 展开时重放诗句淡入动画
+			function replayPoemAnimation() {
+				if (!poemLines) return;
+				poemLines.querySelectorAll('div').forEach((el) => {
+					el.style.animation = 'none';
+					// 强制回流
+					void el.offsetWidth;
+					el.style.animation = '';
+				});
+			}
+			if (poemToggle) {
+				poemToggle.addEventListener('toggle', () => {
+					if (poemToggle.open) replayPoemAnimation();
+				});
+			}
+
+			function makeStars(n = 80) {
+				const frag = document.createDocumentFragment();
+				for (let i = 0; i < n; i++) {
+					const s = document.createElement('span');
+					s.className = 'star';
+					const left = Math.random() * 100;
+					const top = Math.random() * 100;
+					s.style.left = left + '%';
+					s.style.top = top + '%';
+					s.style.animationDelay = (Math.random() * 3.6) + 's';
+					s.style.transform = 'scale(' + (0.6 + Math.random() * 1.6) + ')';
+					frag.appendChild(s);
+				}
+				document.body.appendChild(frag);
+			}
+			document.addEventListener('DOMContentLoaded', () => makeStars(100));
+
+			// JS 轮播回退：交叉淡入 + 当前图轻柔缩放
+			(function initJsSlideshow() {
+				const wrap = document.querySelector('.slides');
+				const slides = Array.from(document.querySelectorAll('.slides .slide'));
+				if (!wrap || slides.length === 0) return;
+				let i = 0; let t = null; const stepMs = 6500;
+				function show(idx) {
+					slides.forEach((el, k) => {
+						el.classList.toggle('active', k === idx);
+						el.classList.toggle('zoom-active', k === idx);
+					});
+					i = idx;
+				}
+				function next() { show((i + 1) % slides.length); }
+				function start() {
+					stop();
+					wrap.classList.add('js-mode');
+					show(i);
+					t = setInterval(next, stepMs);
+				}
+				function stop() { if (t) { clearInterval(t); t = null; } }
+				document.addEventListener('visibilitychange', () => {
+					if (document.hidden) stop(); else start();
+				});
+				document.addEventListener('DOMContentLoaded', start);
+			})();
+		</script>
+	</body>
+</html>
